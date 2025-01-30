@@ -1,0 +1,41 @@
+# roles/mariadb/tasks/configure.yml
+
+---
+
+- name: Configure my.cnf
+  ansible.builtin.template:
+    src: templates/my.cnf.j2
+    dest: /etc/mysql/mariadb.cnf
+    owner: mysql
+    group: mysql
+    mode: '0644'
+
+- name: Construct wsrep_sst_auth and update var_vault_group_galera
+  ansible.builtin.set_fact:
+    var_vault_group_galera: >-
+      {{
+        [
+          { 'name': 'wsrep_sst_auth', 'value': var_vault_group_galera_user ~ ':' ~ var_vault_group_galera_password }
+        ]
+      }}    
+
+- name: Configure Galera
+  ansible.builtin.template:
+    src: templates/galera.cnf.j2
+    dest: /etc/mysql/conf.d/galera.cnf
+    owner: mysql
+    group: mysql
+    mode: '0644'
+
+- name: Configure MySQL client for root
+  ansible.builtin.template:
+    src: templates/my-client.cnf.j2
+    dest: /root/.my.cnf
+    owner: root
+    group: root
+    mode: '0600'
+  vars:
+    client_host: localhost
+    client_user: "{{ var_vault_group_mariadb_user }}"
+    client_password: "{{ var_vault_group_mariadb_password }}"
+  when: var_vault_group_mariadb_user is defined and var_vault_group_mariadb_password is defined  

@@ -1,0 +1,49 @@
+FROM ubuntu:24.04
+
+# Set environment variables to avoid interactive prompts
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install required packages
+RUN apt-get update && apt-get install -y \
+    openssh-server \
+    python3.12 \
+    python3-pip \
+    ansible \
+    sshpass \
+    sudo \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Configure SSH server
+RUN mkdir /var/run/sshd && echo "root:admin321" | chpasswd
+
+# Enable SSH login for root
+RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
+
+# Create a new user "ansuser" with password "random321"
+RUN useradd -m -s /bin/bash ansuser && echo "ansuser:random321" | chpasswd
+
+# Add "ansuser" to the sudo group and grant passwordless sudo
+RUN usermod -aG sudo ansuser && \
+    echo "ansuser ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/ansuser && \
+    chmod 0440 /etc/sudoers.d/ansuser
+
+# Ensure the SSH directory exists and set correct permissions
+RUN mkdir -p /home/ansuser/.ssh && \
+    chmod 700 /home/ansuser/.ssh
+
+# Add the SSH public key to the ansuser's authorized_keys
+COPY id_ed25519_vettabase_ansible_mariadb.pub /home/ansuser/.ssh/authorized_keys
+
+# Set correct permissions for the SSH key
+RUN chmod 600 /home/ansuser/.ssh/authorized_keys && \
+    chown -R ansuser:ansuser /home/ansuser/.ssh
+
+# Expose SSH port
+EXPOSE 22
+EXPOSE 3306
+EXPOSE 4567
+EXPOSE 4568
+EXPOSE 4444
+
+# Start SSH server by default
+CMD ["/usr/sbin/sshd", "-D"]

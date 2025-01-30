@@ -1,0 +1,5 @@
+# group_vars/all/ansible_python_interpreter.yml
+
+---
+
+ansible_python_interpreter: /usr/bin/python3.12

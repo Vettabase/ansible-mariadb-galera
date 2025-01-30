@@ -1,0 +1,18 @@
+# roles/mariadb/templates/galera.cnf.j2
+
+[mysqld]
+
+# Galera Group
+{% for var in var_group_galera %}
+{{ var.name }} = {{ var.value }}
+{% endfor %}
+
+# Galera Group (Vault)
+{% for var in var_vault_group_galera %}
+{{ var.name }} = {{ var.value }}
+{% endfor %}
+
+# Galera Host
+{% for var in var_host_galera %}
+{{ var.name }} = {{ var.value }}
+{% endfor %}

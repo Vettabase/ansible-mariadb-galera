@@ -1,0 +1,61 @@
+services:
+
+  vettabase-ansible-jumphost:
+    image: localhost/vettabase-ansible:latest
+    container_name: vettabase-ansible-jumphost
+    hostname: vettabase-ansible-jumphost
+    networks:
+      vettabase_ansible_net:
+        ipv4_address: 172.10.1.2
+    ports:
+      - "2202:22"
+  vettabase-ansible-proxysql:
+    image: localhost/vettabase-ansible:latest
+    container_name: vettabase-ansible-proxysql
+    hostname: vettabase-ansible-proxysql
+    networks:
+      vettabase_ansible_net:
+        ipv4_address: 172.10.1.10
+    ports:
+      - "2210:22"
+      - "3310:3306"
+
+  vettabase-ansible-galera1:
+    image: localhost/vettabase-ansible:latest
+    container_name: vettabase-ansible-galera1
+    hostname: vettabase-ansible-galera1
+    networks:
+      vettabase_ansible_net:
+        ipv4_address: 172.10.1.21
+    ports:
+      - "2221:22"
+      - "3321:3306"
+
+  vettabase-ansible-galera2:
+    image: localhost/vettabase-ansible:latest
+    container_name: vettabase-ansible-galera2
+    hostname: vettabase-ansible-galera2
+    networks:
+      vettabase_ansible_net:
+        ipv4_address: 172.10.1.22
+    ports:
+      - "2222:22"
+      - "3322:3306"
+
+  vettabase-ansible-galera3:
+    image: localhost/vettabase-ansible:latest
+    container_name: vettabase-ansible-galera3
+    hostname: vettabase-ansible-galera3
+    networks:
+      vettabase_ansible_net:
+        ipv4_address: 172.10.1.23
+    ports:
+      - "2223:22"
+      - "3323:3306"
+
+networks:
+  vettabase_ansible_net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.10.1.0/24

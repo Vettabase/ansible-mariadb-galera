@@ -1,0 +1,24 @@
+---
+
+- name: Clean APT cache
+  ansible.builtin.apt:
+    autoclean: true
+    cache_valid_time: 3600
+
+- name: Install ProxySQL package
+  ansible.builtin.yum:
+    name: proxysql
+    state: present
+  when: ansible_facts['os_family'] == 'RedHat'
+
+- name: Install ProxySQL package
+  ansible.builtin.apt:
+    name: proxysql
+    state: present
+  when: ansible_facts['os_family'] == 'Debian'
+
+# - name: Ensure ProxySQL is enabled and started
+#   ansible.builtin.service:
+#     name: proxysql
+#     state: started
+#     enabled: true

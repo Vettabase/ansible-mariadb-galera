@@ -1,0 +1,13 @@
+# roles/proxysql/tasks/main.yml
+
+---
+
+- name: Include install tasks
+  ansible.builtin.include_tasks: install.yml
+  tags:
+    - install
+
+- name: Include configure tasks
+  ansible.builtin.include_tasks: configure.yml
+  tags:
+    - configure

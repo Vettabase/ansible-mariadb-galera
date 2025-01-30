@@ -1,0 +1,40 @@
+# roles/mariadb/tasks/single-node-restart.yml
+
+---
+
+- name: Check service manager type
+  ansible.builtin.command: ps -p 1 -o comm=
+  register: service_manager
+  changed_when: false
+  delegate_to: "{{ host }}"
+
+- name: Restart Galera node with systemd
+  ansible.builtin.service:
+    name: mariadb
+    state: restarted
+  when:
+    - service_manager.stdout.strip() == "systemd"
+  delegate_to: "{{ host }}"
+
+- name: Restart Galera node with SysVinit
+  ansible.builtin.command: service mysql restart
+  when:
+    - service_manager.stdout.strip() == "init"
+  delegate_to: "{{ host }}"
+
+- name: Start MariaDB with `mariadbd-safe`
+  ansible.builtin.shell: >
+    pkill mariadbd;
+    nohup mariadbd-safe
+    --user=mysql
+    > /var/log/mysql_restart.log 2>&1 &
+  async: 30
+  poll: 0
+  when:
+    - service_manager.stdout.strip() not in ["systemd", "init"]
+  delegate_to: "{{ host }}"  
+
+- name: Debug Restart Execution
+  ansible.builtin.debug:
+    msg: "Galera node {{ host }} restarted using {{ service_manager.stdout.strip() }}"
+  delegate_to: "{{ host }}"

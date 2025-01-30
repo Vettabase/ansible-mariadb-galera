@@ -1,0 +1,25 @@
+# roles/mariadb/tasks/restart.yml
+
+---
+
+- name: Collect hosts with restart enabled
+  ansible.builtin.set_fact:
+    restart_hosts: >-
+      {{
+        ansible_play_hosts | map('extract', hostvars) | selectattr("restart", "defined")
+                           | selectattr("restart", "equalto", 1)
+                           | map(attribute='inventory_hostname')
+                           | list
+      }}
+  run_once: true
+
+- name: Debug sorted restart hosts
+  ansible.builtin.debug:
+    var: restart_hosts
+  run_once: true
+
+- name: Restart Galera cluster node one by one
+  ansible.builtin.include_tasks: single-node-restart.yml
+  loop: "{{ restart_hosts }}"
+  loop_control:
+    loop_var: host

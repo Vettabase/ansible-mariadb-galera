@@ -1,0 +1,31 @@
+# roles/mariadb/tasks/install.yml
+
+---
+
+- name: Clean APT cache
+  ansible.builtin.apt:
+    autoclean: true
+    cache_valid_time: 3600
+
+- name: Add MariaDB repository using the official setup script
+  ansible.builtin.shell: |
+    curl -LsS https://r.mariadb.com/downloads/mariadb_repo_setup | sudo bash -s -- \
+    --mariadb-server-version="mariadb-{{ var_group_mariadb_version }}" \
+    --os-type="{{ var_group_mariadb_os_type }}" \
+    --os-version="{{ var_group_mariadb_os_version }}"
+
+- name: Update package cache
+  ansible.builtin.apt:
+    update_cache: true
+
+- name: Install MariaDB server with recommended dependencies
+  ansible.builtin.package:
+    name:
+      - galera-4
+      - mariadb-client
+      - mariadb-server
+      - mariadb-backup
+      - pv
+    state: present
+    install_recommends: true
+  ignore_errors: false

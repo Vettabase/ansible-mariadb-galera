@@ -1,0 +1,33 @@
+# roles/mariadb/tasks/main.yml
+
+---
+
+- name: Include install tasks
+  ansible.builtin.include_tasks: install.yml
+  tags:
+    - install
+
+- name: Include configure tasks
+  ansible.builtin.include_tasks: configure.yml
+  tags:
+    - configure
+
+- name: Configure datadirectory
+  ansible.builtin.include_tasks: datadir.yml
+  tags:
+    - datadir
+
+- name: Initialization
+  ansible.builtin.include_tasks: initialise.yml
+  tags:
+    - initialise
+
+- name: Bootstrapping
+  ansible.builtin.include_tasks: bootstrap.yml
+  tags:
+    - bootstrap
+
+- name: Restarting
+  ansible.builtin.include_tasks: restart.yml
+  tags:
+    - restart

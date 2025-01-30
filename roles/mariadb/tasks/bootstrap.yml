@@ -1,0 +1,31 @@
+# roles/mariadb/tasks/bootstrap.yml
+
+---
+
+- name: Check service manager type
+  ansible.builtin.command: ps -p 1 -o comm=
+  register: service_manager
+  changed_when: false
+
+- name: Bootstrap the Galera cluster with '--wsrep-new-cluster'
+  ansible.builtin.shell: >
+    mariadbd-safe
+    {% if socket %} --socket={{ socket }} {% endif %}
+    --wsrep-new-cluster --user=mysql --basedir={{ basedir }} --datadir={{ datadir }}
+    > /var/log/mysql_bootstrap.log 2>&1 &
+  async: 30
+  poll: 0
+  when:
+    - service_manager.stdout.strip() not in ["systemd", "init"]
+    - hostvars[inventory_hostname].bootstrap | default(0) == 1
+
+- name: Bootstrap the Galera cluster with SysVinit
+  ansible.builtin.command: service mysql bootstrap
+  when:
+    - service_manager.stdout.strip() == "init"
+    - hostvars[inventory_hostname].bootstrap | default(0) == 1    
+
+- name: Debug Bootstrap Execution
+  ansible.builtin.debug:
+    msg: "Galera cluster has been bootstrapped on host {{ inventory_hostname }} using {{ service_manager.stdout.strip() }}"
+  when: hostvars[inventory_hostname].bootstrap | default(0) == 1

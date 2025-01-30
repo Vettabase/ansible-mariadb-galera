@@ -1,0 +1,7 @@
+# group_vars/all/os.yml - the global variables file for the ansible playbook
+  
+---
+
+var_group_mariadb_version: '11.4.4'
+var_group_mariadb_os_type: 'ubuntu'
+var_group_mariadb_os_version: 'noble'

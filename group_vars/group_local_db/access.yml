@@ -1,0 +1,5 @@
+# group_vars/group_local_db/access.yml
+
+---
+
+ansible_ssh_extra_args: "-o ProxyJump=ansuser@127.0.0.1:2202"

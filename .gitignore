@@ -1,0 +1,4 @@
+vault.yml
+vaultpass.txt
+*.retry
+id_ed25519_vettabase_ansible_mariad*

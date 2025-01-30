@@ -1,0 +1,29 @@
+# group_vars/group_local_db/mariadb.yml
+
+---
+
+# MariaDB Group - Basic
+var_group_mariadb_basic:
+  - { name: 'pid_file', value: '/tmp/mysqld.pid' }
+  - { name: 'socket', value: '/tmp/mysqld.sock' }
+  - { name: 'basedir', value: '/usr' }
+  - { name: 'bind_address', value: '0.0.0.0' }
+  - { name: 'character_set_server', value: 'utf8mb4' }
+
+# MariaDB Group - Server
+var_group_mariadb_server:
+  - { name: 'datadir', value: '/var/lib/mysql' }
+  - { name: 'max_connections', value: 10 }
+
+# MariaDB Group - Logs
+var_group_mariadb_logs:
+  - { name: 'log_error', value: '/var/lib/mysql/error.log' }
+  - { name: 'expire_logs_days', value: 7 }
+  - { name: 'log_bin', value: 'binlog' }
+  - { name: 'binlog_format', value: 'ROW' }
+
+# MariaDB Group - InnoDB
+var_group_mariadb_innodb:
+  - { name: 'innodb_buffer_pool_size', value: '256M' }
+  - { name: 'innodb_autoinc_lock_mode', value: 1 }
+  - { name: 'default_storage_engine', value: 'InnoDB' }

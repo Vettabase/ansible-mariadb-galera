@@ -1,0 +1,13 @@
+# host_vars/vettabase-ansible-galera1.yml
+
+---
+
+# MariaDB Host
+var_host_mariadb:
+  - { name: 'server_id', value: 17210121 }
+
+# Galera Host
+var_host_galera:
+  - { name: 'wsrep_node_name', value: 'ansible-galera1' }
+  - { name: 'wsrep_node_address', value: '172.10.1.21' }
+  - { name: 'wsrep_cluster_address', value: 'gcomm://172.10.1.21,172.10.1.22,172.10.1.23' }

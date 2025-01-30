@@ -1,0 +1,27 @@
+# roles/mariadb/templates/my.cnf.j2
+
+[mysqld]
+
+user = mysql
+
+# MariaDB Group - Basic
+{% for var in var_group_mariadb_basic %}
+{{ var.name }} = {{ var.value }}
+{% endfor %}
+
+# MariaDB Group - Server
+{% for var in var_group_mariadb_server %}
+{{ var.name }} = {{ var.value }}
+{% endfor %}
+
+# MariaDB Group - Logs
+{% for var in var_group_mariadb_logs %}
+{{ var.name }} = {{ var.value }}
+{% endfor %}
+
+# MariaDB Group - InnoDB
+{% for var in var_group_mariadb_innodb %}
+{{ var.name }} = {{ var.value }}
+{% endfor %}
+
+!includedir /etc/mysql/conf.d/

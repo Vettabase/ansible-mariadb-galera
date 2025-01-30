@@ -1,0 +1,100 @@
+# roles/mariadb/tasks/initialise.yml
+
+---
+
+- name: Extract basedir, datadir, and socket from group variables
+  ansible.builtin.set_fact:
+    basedir: >-
+      {{
+        var_group_mariadb_basic | selectattr('name', 'equalto', 'basedir') | map(attribute='value') | first
+      }}
+    datadir: >-
+      {{
+        var_group_mariadb_server | selectattr('name', 'equalto', 'datadir') | map(attribute='value') | first
+      }}
+    socket: >-
+      {{
+        var_group_mariadb_basic | selectattr('name', 'equalto', 'socket') | map(attribute='value') | first | default(None)
+      }}
+
+- name: Debug extracted variables
+  ansible.builtin.debug:
+    msg: "Basedir={{ basedir }}, Datadir={{ datadir }}, Socket={{ socket }}"      
+
+- name: Install MariaDB database files
+  ansible.builtin.command:
+    cmd: mariadb-install-db --user=mysql --basedir={{ basedir }} --datadir={{ datadir }}
+  when: hostvars[inventory_hostname].install_db | default(0) == 1
+
+- name: Debug Install-DB Execution
+  ansible.builtin.debug:
+    msg: "MariaDB database files initialized on host {{ inventory_hostname }} with basedir={{ basedir }} and datadir={{ datadir }}"
+  when: hostvars[inventory_hostname].install_db | default(0) == 1
+
+- name: Temporarily bootstrap MariaDB for initialization
+  ansible.builtin.command:
+    cmd: >
+      mariadbd
+      {% if socket is not none %} --socket={{ socket }} {% endif %}
+      --wsrep-new-cluster --user=mysql --basedir={{ basedir }} --datadir={{ datadir }}
+  async: 30
+  poll: 0
+  when: hostvars[inventory_hostname].install_db | default(0) == 1
+
+- name: Wait for MariaDB to be available
+  ansible.builtin.wait_for:
+    port: 3306
+    state: started
+    delay: 5
+    timeout: 60
+  when: hostvars[inventory_hostname].install_db | default(0) == 1  
+
+- name: Set root password
+  ansible.builtin.command:
+    cmd: >
+      mariadb
+      {% if socket is not none %} --socket={{ socket }} {% endif %} 
+      --user=root 
+      --execute="ALTER USER '{{ var_vault_group_mariadb_user }}'@'localhost' IDENTIFIED BY '{{ var_vault_group_mariadb_password }}';"
+  when: hostvars[inventory_hostname].install_db | default(0) == 1
+
+- name: Create SST user
+  ansible.builtin.command:
+    cmd: >
+      mariadb
+      {% if socket is not none %} --socket={{ socket }} {% endif %} 
+      --user=root 
+      --execute="CREATE USER IF NOT EXISTS '{{ var_vault_group_galera_user }}'@'localhost' IDENTIFIED BY '{{ var_vault_group_galera_password }}'; GRANT RELOAD, PROCESS, LOCK TABLES, BINLOG MONITOR ON *.* TO '{{ var_vault_group_galera_user }}'@'localhost';"
+  when: hostvars[inventory_hostname].install_db | default(0) == 1
+  
+- name: Debug SST User Creation
+  ansible.builtin.debug:
+    msg: "SST user {{ var_vault_group_galera_user }}@localhost created with necessary permissions"
+  when: hostvars[inventory_hostname].bootstrap | default(0) == 1
+
+- name: Debug root password creation
+  ansible.builtin.debug:
+    msg: "Root user password set for {{ var_vault_group_mariadb_user }}@localhost"
+  when: hostvars[inventory_hostname].install_db | default(0) == 1
+
+- name: Verify root password
+  ansible.builtin.command:
+    cmd: >
+      mariadb
+      {% if socket is not none %} --socket={{ socket }} {% endif %}
+      --user={{ var_vault_group_mariadb_user }} --password={{ var_vault_group_mariadb_password }}
+      --execute="SELECT 1;"
+  when: hostvars[inventory_hostname].install_db | default(0) == 1
+
+- name: Stop temporarily bootstrapped MariaDB
+  ansible.builtin.command:
+    cmd: >
+      mariadb-admin
+      {% if socket is not none %} --socket={{ socket }} {% endif %}
+      --user={{ var_vault_group_mariadb_user }} --password={{ var_vault_group_mariadb_password }} shutdown
+  when: hostvars[inventory_hostname].install_db | default(0) == 1
+
+- name: Debug user creation Execution
+  ansible.builtin.debug:
+    msg: "User {{ var_vault_group_mariadb_user }} created in {{ inventory_hostname }}."
+  when: hostvars[inventory_hostname].install_db | default(0) == 1

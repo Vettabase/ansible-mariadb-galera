@@ -1,0 +1,21 @@
+# roles/mariadb/tasks/datadir.yml
+
+---
+
+- name: Ensure datadir exists
+  ansible.builtin.file:
+    path: "{{ item.value }}"
+    state: directory
+    owner: mysql
+    group: mysql
+    mode: '0755'
+  loop: "{{ var_group_mariadb_server | selectattr('name', 'equalto', 'datadir') | list }}"
+  loop_control:
+    label: "{{ item.value }}"
+
+- name: Change ownership of datadir
+  ansible.builtin.command:
+    cmd: "chown -R mysql:mysql {{ item.value }}"
+  loop: "{{ var_group_mariadb_server | selectattr('name', 'equalto', 'datadir') | list }}"
+  loop_control:
+    label: "{{ item.value }}"

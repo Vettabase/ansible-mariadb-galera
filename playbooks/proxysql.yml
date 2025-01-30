@@ -1,0 +1,11 @@
+# playbooks/proxysql.yml
+
+---
+
+- name: Main playbook to manage ProxySQL installation and configuration
+  hosts:
+    - "{{ target_hosts }}"
+  become: true
+  roles:
+    - proxysql
+  

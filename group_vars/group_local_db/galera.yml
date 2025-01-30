@@ -1,0 +1,13 @@
+# group_vars/group_local_db/galera.yml
+
+---
+
+# Galera Group
+var_group_galera:
+  - { name: 'wsrep_cluster_name', value: 'local' }
+  - { name: 'wsrep_provider', value: '/usr/lib/galera/libgalera_smm.so' }
+  - { name: 'wsrep_provider_options', value: 'gcache.size=1G;gcache.recover=yes' }
+  - { name: 'wsrep_sst_method', value: 'rsync' }
+  - { name: 'wsrep_status_file', value: 'wsrep_status' }
+  - { name: 'wsrep_on', value: 'ON' }
+  - { name: 'wsrep_cluster_address', value: "gcomm://{{ groups[target_hosts] | map('extract', hostvars, ['ansible_host']) | map('regex_replace', '^(.*)$', '\\1:4567') | join(',') }}" }

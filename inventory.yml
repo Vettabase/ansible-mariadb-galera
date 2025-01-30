@@ -1,0 +1,46 @@
+# inventory.yml - the inventory file for the ansible playbook
+
+all:
+
+  hosts:
+    vettabase-ansible-jumphost:
+      ansible_host: 127.0.0.1
+      ansible_port: 2202
+    vettabase-ansible-proxysql:
+      ansible_host: 172.10.1.10
+      ansible_port: 22
+    vettabase-ansible-galera1:
+      ansible_host: 172.10.1.21
+      ansible_port: 22
+      bootstrap: 1
+      restart: 0
+      install_db: 1
+    vettabase-ansible-galera2:
+      ansible_host: 172.10.1.22
+      ansible_port: 22
+      bootstrap: 0
+      restart: 1
+      install_db: 0
+    vettabase-ansible-galera3:
+      ansible_host: 172.10.1.23
+      ansible_port: 22
+      bootstrap: 0
+      restart: 1
+      install_db: 0
+
+  children:
+
+    group_local:
+      children:
+        group_local_jumphost:
+          hosts:
+            vettabase-ansible-jumphost:
+        group_local_proxysql:
+          hosts:
+            vettabase-ansible-proxysql:
+        group_local_db:
+          hosts:
+            vettabase-ansible-galera1:
+            vettabase-ansible-galera2:
+            vettabase-ansible-galera3:
+            

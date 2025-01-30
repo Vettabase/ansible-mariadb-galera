@@ -1,0 +1,8 @@
+# group_vars/all/access.yml - the global variables file for the ansible playbook
+  
+---
+
+ansible_user: "{{ vault_ansible_ssh_user }}"
+ansible_ssh_private_key_file: "{{ vault_ansible_ssh_key }}"
+ansible_become_password: "{{ vault_ansible_ssh_pswd }}"
+ansible_ssh_common_args: "-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
