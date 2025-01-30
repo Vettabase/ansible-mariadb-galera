@@ -20,7 +20,7 @@ for port in $ports; do
 done
 
 # Build the custom Docker image:
-docker build --tag localhost/vettabase-ansible:latest --file local-Dockerfile . --no-cache
+docker build --tag localhost/vettabase-ansible:latest --env-file local-Dockerfile.env --file local-Dockerfile . --no-cache
 
 # Start Docker Compose
 docker-compose --file local-docker-compose.yml up --detach
