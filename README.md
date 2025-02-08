@@ -226,8 +226,8 @@ docker network ls
 - **Data Loss:** If you’re using Docker volumes for persistent data, ensure you’ve backed up any critical data before using docker system prune --volumes.
 - **Custom Cleanup:** If you’re using specific Docker resources (e.g., named volumes or external networks), ensure those are explicitly removed or preserved as needed.
 
----
+## Copyright and License
 
 Copyright 2025 Vettabase Ltd and contributors.
 
-[ansible-mariadb-galera](https://github.com/Vettabase/ansible-mariadb-galera) is licensed under [GPLv3](https://www.gnu.org/licenses/gpl-3.0.en.html).
+[ansible-mariadb-galera](https://github.com/Vettabase/ansible-mariadb-galera) is licensed under the GPLv3. See the `LICENSE` file.
