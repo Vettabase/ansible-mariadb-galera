@@ -228,12 +228,12 @@ docker network ls
 
 ## Contacts
 
-[ansible-mariadb-galera](https://github.com/Vettabase/ansible-mariadb-galera) is a Vettabase project.
+[ansible-mariadb-galera](https://github.com/Vettabase/ansible-mariadb-galera) is a [Vettabase](https://vettabase.com) project.
 
 The current maintainer is Mykhaylo Rykmas. Contact: mykhaylo.rykmas@vettabase.com.
 
 ## Copyright and License
 
-Copyright 2025 Vettabase Ltd and contributors.
+Copyright 2025 [Vettabase Ltd](https://vettabase.com) and contributors.
 
 [ansible-mariadb-galera](https://github.com/Vettabase/ansible-mariadb-galera) is licensed under the GPLv3. See the `LICENSE` file.
